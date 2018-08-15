@@ -184,3 +184,37 @@
 (expect "{\"my-bytes\":\"0xC42360D7\"}"
         (json/generate-string {:my-bytes (byte-array [196 35  96 215  8 106 108 248 183 215 244 143  17 160 53 186
                                                       213 30 116  25 87  31 123 172 207 108  47 107 191 215 76  92])}))
+
+
+;; ===========================  TEST api-allow-origin header  ===========================
+
+;; Access-Control-Allow-Origin doesn't need to be added when the request is from the host origin
+(expect 
+  false
+  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "*" #","))))]
+  (api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+;; Access-Control-Allow-Origin doesn't need to be added when the request is from the host origin
+(expect 
+  false
+  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
+  (api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+;; Should not be added if the env setting was not set
+(expect 
+  false
+  (with-redefs [config-allow-origins (atom ())]
+  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+;; Always added if * was set
+(expect 
+  true
+  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "*" #","))))]
+  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+;; Add if the origin was in the env setting
+(expect 
+  true
+  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
+  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+;; Make sure we can specify more than one allowed origins
+(expect 
+  true
+  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://anotherorgin:3000 , http://otherorgin:3000" #","))))]
+  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
