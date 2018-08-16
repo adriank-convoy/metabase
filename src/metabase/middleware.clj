@@ -48,18 +48,18 @@
   [{:keys [uri]}]
   (re-matches #"^/embed/.*$" uri))
 
-(def config-allow-origins 
-  (atom 
-    (when-not (str/blank? (config/config-str :mb-api-allow-origin)) 
+(def ^:private config-allow-origins
+  (atom
+    (when-not (str/blank? (config/config-str :mb-api-allow-origin))
       (into #{} (map str/trim (str/split (config/config-str :mb-api-allow-origin) #","))))))
 
-(defn api-allow-origin?
+(defn- api-allow-origin?
   "Should the Access-Control-Allow-Origin header be added for this request?"
   [origin site-url]
   (and (not (= origin site-url))
        (not (str/blank? origin))
-       (not (empty? @config-allow-origins)) 
-       (or (= (set ["*"]) @config-allow-origins) 
+       (not (empty? @config-allow-origins))
+       (or (= (set ["*"]) @config-allow-origins)
            (contains? @config-allow-origins origin))))
 ;;; ------------------------------------------- AUTH & SESSION MANAGEMENT --------------------------------------------
 

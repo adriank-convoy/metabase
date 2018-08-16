@@ -189,32 +189,37 @@
 ;; ===========================  TEST api-allow-origin header  ===========================
 
 ;; Access-Control-Allow-Origin doesn't need to be added when the request is from the host origin
-(expect 
+(expect
   false
-  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "*" #","))))]
-  (api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (fn [] (atom (into #{} (map string/trim (string/split "*" #",")))))]
+  (#'mid/api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+
 ;; Access-Control-Allow-Origin doesn't need to be added when the request is from the host origin
-(expect 
+(expect
   false
-  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
-  (api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
+  (#'mid/api-allow-origin? "http://localhost:3000" "http://localhost:3000")))
+
 ;; Should not be added if the env setting was not set
-(expect 
+(expect
   false
-  (with-redefs [config-allow-origins (atom ())]
-  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (atom ())]
+  (#'mid/api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+
 ;; Always added if * was set
-(expect 
+(expect
   true
-  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "*" #","))))]
-  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (atom (into #{} (map string/trim (string/split "*" #","))))]
+  (#'mid/api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+
 ;; Add if the origin was in the env setting
-(expect 
+(expect
   true
-  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
-  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (atom (into #{} (map string/trim (string/split "http://otherorgin:3000" #","))))]
+  (#'mid/api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+
 ;; Make sure we can specify more than one allowed origins
-(expect 
+(expect
   true
-  (with-redefs [config-allow-origins (atom (into #{} (map string/trim (string/split "http://anotherorgin:3000 , http://otherorgin:3000" #","))))]
-  (api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
+  (with-redefs [mid/config-allow-origins (atom (into #{} (map string/trim (string/split "http://anotherorgin:3000 , http://otherorgin:3000" #","))))]
+  (#'mid/api-allow-origin? "http://otherorgin:3000" "http://localhost:3000")))
