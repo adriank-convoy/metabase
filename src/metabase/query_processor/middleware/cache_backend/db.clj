@@ -5,11 +5,13 @@
             [metabase.public-settings :as public-settings]
             [metabase.query-processor.middleware.cache-backend.interface :as i]
             [metabase.util.date :as du]
-            [toucan.db :as db]))
+            [toucan.db :as db]
+            [clojure.tools.logging :as log]))
 
 (defn- cached-results
   "Return cached results for QUERY-HASH if they exist and are newer than MAX-AGE-SECONDS."
   [query-hash max-age-seconds]
+  ;;(log/error (str "MAX-AGE-SECONDS: " max-age-seconds))
   (when-let [{:keys [results updated_at]} (db/select-one [QueryCache :results :updated_at]
                                             :query_hash query-hash
                                             :updated_at [:>= (du/->Timestamp (- (System/currentTimeMillis)

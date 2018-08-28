@@ -9,7 +9,7 @@
              [interface :as i]
              [util :as qputil]]))
 
-(defn- query->native-form
+(defn query->native-form
   "Return a `:native` query form for QUERY, converting it from MBQL if needed."
   [query]
   (u/prog1 (if-not (qputil/mbql-query? query)

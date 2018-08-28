@@ -418,6 +418,18 @@ const SECTIONS = [
         getHidden: settings => !settings["enable-query-caching"],
         allowValueCollection: true,
       },
+      {
+        key: "enable-redshiftstate-caching",
+        display_name: t`Enable Redshift State Caching`,
+        type: "boolean",
+      },
+      {
+        key: "redshiftstate-caching-db-num",
+        display_name: t`Redshift DB Number`,
+        type: "number",
+        getHidden: settings => !settings["enable-redshiftstate-caching"],
+        allowValueCollection: true,
+      },
     ],
   },
   /*

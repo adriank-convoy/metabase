@@ -126,6 +126,13 @@
           :can-write?        i/superuser?}))
 
 
+(defn get-db-details 
+  [db-id]
+  (:details (db/select-one [Database :details] :id db-id))
+   )
+(defn get-db-details-tester
+  ^clojure.lang.Keyword [{details :details}]
+  details)
 ;;; ---------------------------------------------- Hydration / Util Fns ----------------------------------------------
 
 (defn ^:hydrate tables

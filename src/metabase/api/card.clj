@@ -40,7 +40,8 @@
              [db :as db]
              [hydrate :refer [hydrate]]])
   (:import java.util.UUID
-           metabase.models.card.CardInstance))
+           metabase.models.card.CardInstance
+           [tester TestClass]))
 
 ;;; --------------------------------------------------- Hydration ----------------------------------------------------
 
@@ -546,14 +547,18 @@
   `query-caching-ttl-ratio`. If the TTL is less than a second, this returns `nil` (i.e., the cache should not be
   utilized.)"
   [query]
-  (when-let [average-duration (query/average-execution-time-ms (qputil/query-hash query))]
-    (let [ttl-seconds (Math/round (float (/ (* average-duration (public-settings/query-caching-ttl-ratio))
-                                            1000.0)))]
-      (when-not (zero? ttl-seconds)
-        (log/info (format "Question's average execution duration is %d ms; using 'magic' TTL of %d seconds"
-                          average-duration ttl-seconds)
-                  (u/emoji "💾"))
-        ttl-seconds))))
+  ;;(log/info (str "MAGIC CACHE FUUU " (cache/is-redshift-statecache-enabled?)))
+  ;;(if (cache/is-redshift-statecache-enabled?)
+  ;;  (cache/redshift-statecache-get-max-ttl-seconds)
+    (when-let [average-duration (query/average-execution-time-ms (qputil/query-hash query))]
+      (let [ttl-seconds (Math/round (float (/ (* average-duration (public-settings/query-caching-ttl-ratio))
+                                              1000.0)))]
+        (log/info (str "MAGIC CACHE AVERAGE DURATION: " average-duration " MAGIC CACHE TTL: " ttl-seconds))
+        (when-not (zero? ttl-seconds)
+          (log/info (format "Question's average execution duration is %d ms; using 'magic' TTL of %d seconds"
+                            average-duration ttl-seconds)
+                    (u/emoji "💾"))
+          ttl-seconds))))
 
 (defn- query-for-card [card parameters constraints middleware]
   (let [query (assoc (:dataset_query card)

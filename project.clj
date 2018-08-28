@@ -5,6 +5,7 @@
   :description "Metabase Community Edition"
   :url "http://metabase.com/"
   :min-lein-version "2.5.0"
+  :java-source-paths ["src/java"]
   :aliases {"bikeshed" ["bikeshed" "--max-line-length" "205"]
             "check-reflection-warnings" ["with-profile" "+reflection-warnings" "check"]
             "test" ["with-profile" "+expectations" "expectations"]
@@ -103,7 +104,8 @@
                  [toucan "1.1.9"                                      ; Model layer, hydration, and DB utilities
                   :exclusions [honeysql]]]
   :repositories [["bintray" "https://dl.bintray.com/crate/crate"]     ; Repo for Crate JDBC driver
-                 ["redshift" "https://s3.amazonaws.com/redshift-driver-downloads"]]
+                 ["redshift" "https://s3.amazonaws.com/redshift-driver-downloads"]
+                 ["local" {:url "file:maven_repository" :username "" :password ""}]]
   :plugins [[lein-environ "1.1.0"]                                    ; easy access to environment variables
             [lein-ring "0.12.3"                                       ; start the HTTP server with 'lein ring server'
              :exclusions [org.clojure/clojure]]                       ; TODO - should this be a dev dependency ?
